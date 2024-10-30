@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro Completo</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+    <script src="https://code.iconify.design/2/2.1.0/iconify.min.js"></script>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+            color: #333;
+            transition: background-color 0.3s, color 0.3s;
+            font-family: 'Roboto', sans-serif;
+        }
+        .container {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            max-width: 400px;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        h1 {
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: #1976d2;
+            font-weight: 300;
+        }
+        .confirmation-message {
+            font-size: 18px;
+            margin-bottom: 20px;
+            color: #4caf50;
+        }
+        .btn {
+            background-color: #1976d2;
+        }
+        .checkmark-icon {
+            font-size: 100px;
+            color: #4caf50;
+            margin: 20px auto;
+            display: block;
+            animation: scaleUp 0.5s ease-in-out;
+        }
+        .dark-mode {
+            background-color: #121212;
+            color: #e0e0e0;
+        }
+        .dark-mode .container {
+            background-color: #1e1e1e;
+            color: #e0e0e0;
+        }
+        .dark-mode h1 {
+            color: #64b5f6;
+        }
+        .dark-mode .confirmation-message {
+            color: #81c784;
+        }
+        .dark-mode .btn {
+            background-color: #64b5f6;
+            color: #121212;
+        }
+        .dark-mode .checkmark-icon {
+            color: #81c784;
+        }
+        @keyframes scaleUp {
+            0% {
+                transform: scale(0);
+                opacity: 0;
+            }
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="center-align">Registro Completo</h1>
+        <span class="iconify checkmark-icon" data-icon="mdi:check-circle-outline" data-inline="false"></span>
+        <div class="confirmation-message center-align">
+            Seu registro foi confirmado com sucesso!
+        </div>
+        <div class="center-align">
+            <a href="/" class="btn waves-effect waves-light">Voltar para a Página Inicial
+                <i class="material-icons right">home</i>
+            </a>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const savedDarkMode = localStorage.getItem('darkMode');
+            if (savedDarkMode === 'true') {
+                document.body.classList.add('dark-mode');
+            }
+        });
+    </script>
+</body>
+</html>

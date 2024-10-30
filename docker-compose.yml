@@ -1,0 +1,29 @@
+version: '3'
+
+services:
+  mariadb:
+    image: mariadb:latest
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: time_record
+      MYSQL_USER: user
+      MYSQL_PASSWORD: pDDK26o9C9TeWKwmCVkg676ReNkPoGKr
+    ports:
+      - "13406:3306"
+    volumes:
+      - mariadb_data:/var/lib/mysql
+
+#   time_record_app:
+#     image: time-record-app:latest
+#     ports:
+#       - "8000:8000"
+#     environment:
+#       - DB_NAME=${DB_NAME}
+#       - DB_USER=${DB_USER}
+#       - DB_PASSWORD=${DB_PASSWORD}
+#       - DB_HOST=${DB_HOST}
+#     depends_on:
+#       - mariadb
+
+volumes:
+  mariadb_data:

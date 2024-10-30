@@ -1,0 +1,165 @@
+<div class="container">
+    <!-- Filtros -->
+    <div class="row">
+        <div class="input-field col s12 m3">
+            <input type="date" id="dateFilter">
+            <label for="dateFilter">Data</label>
+        </div>
+        <div class="input-field col s12 m3">
+            <input type="time" id="timeFilter">
+            <label for="timeFilter">Hora</label>
+        </div>
+        <div class="input-field col s12 m3">
+            <select id="typeFilter">
+                <option value="">Todos</option>
+                <option value="entrada">Entrada</option>
+                <option value="saida">Saída</option>
+                <option value="almoco-entrada">Entrada Almoço</option>
+                <option value="almoco-saida">Saída Almoço</option>
+            </select>
+            <label>Tipo</label>
+        </div>
+        <div class="col s12 m3">
+            <button class="btn waves-effect waves-light blue darken-2" onclick="applyFilters()" style="font-size: 16px; text-transform: none;">
+                <span style="display: flex; align-items: center;">
+                    Filtrar
+                    <iconify-icon icon="tabler:filter" style="margin-left: 8px; font-size: 24px;"></iconify-icon>
+                </span>
+            </button>
+        </div>
+    </div>
+
+    <div class="responsive-table" style="max-height: 500px; overflow-y: auto;">
+        <table class="striped highlight">
+            <thead>
+                <tr>
+                    <th>Data</th>
+                    <th>Tipo</th>
+                    <th>Hora</th>
+                </tr>
+            </thead>
+            <tbody id="timeRecordsBody">
+            <!-- Mock data for time records -->
+            <tr>
+                <td data-label="Data">2023-05-15</td>
+                <td data-label="Tipo">Entrada</td>
+                <td data-label="Hora">09:00:00</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    fetchTimeRecords();
+    var elems = document.querySelectorAll('select');
+    var instances = M.FormSelect.init(elems);
+});
+
+function fetchTimeRecords() {
+    const token = localStorage.getItem('token');
+    fetch('/api/time-records', {
+        headers: {
+            'Authorization': token
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        updateTable(data);
+    })
+    .catch(error => {
+        console.error('Error fetching time records:', error);
+        M.toast({html: 'Erro ao carregar registros de tempo', classes: 'red'});
+    });
+}
+
+function updateTable(data) {
+    const tableBody = document.getElementById('timeRecordsBody');
+    tableBody.innerHTML = '';
+    data.forEach(record => {
+        const row = `
+            <tr>
+                <td data-label="Data">${new Date(record.date).toLocaleDateString()}</td>
+                <td data-label="Tipo">${getRecordTypeName(record.type)}</td>
+                <td data-label="Hora">${new Date(record.date).toLocaleTimeString()}</td>
+                <td data-label="Usuário">${record.user ? record.user.name : 'N/A'}</td>
+                <td data-label="Ações">
+                    <a class="btn-floating btn-small waves-effect waves-light blue" onclick="editRecord(${record.id})"><i class="material-icons">edit</i></a>
+                    <a class="btn-floating btn-small waves-effect waves-light red" onclick="deleteRecord(${record.id})"><i class="material-icons">delete</i></a>
+                </td>
+            </tr>
+        `;
+        tableBody.innerHTML += row;
+    });
+}
+
+function getRecordTypeName(type) {
+    const types = {
+        'entrada': 'Entrada',
+        'saida': 'Saída',
+        'almoco-entrada': 'Entrada Almoço',
+        'almoco-saida': 'Saída Almoço'
+    };
+    return types[type] || type;
+}
+
+function editRecord(id) {
+    // Implementar lógica de edição
+    console.log('Editar registro:', id);
+}
+
+function deleteRecord(id) {
+    if (confirm('Tem certeza que deseja excluir este registro?')) {
+        const token = localStorage.getItem('token');
+        fetch(`/api/time-records/${id}`, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': token
+            }
+        })
+        .then(response => {
+            if (response.ok) {
+                M.toast({html: 'Registro excluído com sucesso', classes: 'green'});
+                fetchTimeRecords();
+            } else {
+                throw new Error('Falha ao excluir registro');
+            }
+        })
+        .catch(error => {
+            console.error('Error deleting record:', error);
+            M.toast({html: 'Erro ao excluir registro', classes: 'red'});
+        });
+    }
+}
+
+function applyFilters() {
+    const dateFilter = document.getElementById('dateFilter').value;
+    const typeFilter = document.getElementById('typeFilter').value;
+    const userFilter = document.getElementById('userFilter').value.toLowerCase();
+
+    const token = localStorage.getItem('token');
+    fetch('/api/time-records', {
+        headers: {
+            'Authorization': token
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        const filteredData = data.filter(record => {
+            const recordDate = new Date(record.date).toLocaleDateString();
+            const recordType = record.type;
+            const recordUser = record.user ? record.user.name.toLowerCase() : '';
+
+            return (!dateFilter || recordDate === dateFilter) &&
+                   (!typeFilter || recordType === typeFilter) &&
+                   (!userFilter || recordUser.includes(userFilter));
+        });
+        updateTable(filteredData);
+    })
+    .catch(error => {
+        console.error('Error applying filters:', error);
+        M.toast({html: 'Erro ao aplicar filtros', classes: 'red'});
+    });
+}
+</script>

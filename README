@@ -1,0 +1,9 @@
+This is a simple Application for a time tracking system built with Node.js, Express, and Sequelize. It allows users to record their entry and exit times, as well as their lunch times.
+
+#Features
+
+- User registration
+- User login
+- Time record (entry, exit, lunch)
+- Report generation
+

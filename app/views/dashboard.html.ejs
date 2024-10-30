@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+    <style>
+        body {
+            display: flex;
+            min-height: 100vh;
+            flex-direction: column;
+        }
+        main {
+            flex: 1 0 auto;
+        }
+        .sidenav {
+            width: 250px;
+        }
+        .brand-logo {
+            padding-left: 15px !important;
+        }
+        @media only screen and (min-width: 993px) {
+            main, footer {
+                padding-left: 250px;
+            }
+            nav .nav-wrapper {
+                padding-left: 250px;
+            }
+        }
+        .sidenav li > a {
+            display: flex;
+            align-items: center;
+        }
+        .sidenav li > a > iconify-icon {
+            margin-right: 10px;
+        }
+        .sidenav li > a.active {
+            background-color: rgba(0, 0, 0, 0.05);
+            border-left: 3px solid #1976D2;
+        }
+        #darkModeToggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background-color: #1976D2;
+        }
+        .dark-mode #darkModeToggle {
+            background-color: #64B5F6;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav class="blue darken-2">
+            <div class="nav-wrapper">
+                <a href="#" data-target="slide-out" class="sidenav-trigger"><i class="material-icons">menu</i></a>
+            </div>
+        </nav>
+    </header>
+
+    <ul id="slide-out" class="sidenav sidenav-fixed">
+        <li><div class="user-view">
+            <div class="background blue darken-2" style="height: 64px; display: flex; align-items: center; justify-content: center;">
+                <h4 class="white-text" style="margin: 0;">Devtick</h4>
+            </div>
+        </div></li>
+        <li style="margin-top: 48px;">
+            <a href="#!" class="active blue-text text-darken-2" style="font-size: 16px; padding: 12px;">
+                <iconify-icon icon="tabler:layout-dashboard" style="font-size: 24px; margin-right: 12px;"></iconify-icon>
+                Dashboard
+            </a>
+        </li>
+        <li>
+            <a href="#!" id="link-register-tick" target="_blank" class="blue-text text-darken-2" style="font-size: 16px; padding: 12px;">
+                <iconify-icon icon="tabler:clock" style="font-size: 24px; margin-right: 12px;"></iconify-icon>
+                Registrar Ponto
+            </a>
+        </li>
+        <li>
+            <a href="#!" class="blue-text text-darken-2" style="font-size: 16px; padding: 12px;">
+                <iconify-icon icon="tabler:history" style="font-size: 24px; margin-right: 12px;"></iconify-icon>
+                Horas Registradas
+            </a>
+        </li>
+        <li><div class="divider"></div></li>
+        <li>
+            <a href="#!" class="waves-effect blue-text text-darken-2" onclick="logout()" style="font-size: 16px; padding: 12px;">
+                <iconify-icon icon="tabler:logout" style="font-size: 24px; margin-right: 12px;"></iconify-icon>
+                Sair
+            </a>
+        </li>
+    </ul>
+
+    <main>
+        <div class="container-fluid" style="margin-top: 80px;">
+            <%- include('./dashboard/table-ticks.html.ejs') %>
+        </div>
+    </main>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    <script>
+
+        window.onload = () => {
+            token = localStorage.getItem('token');
+
+            if (token) {
+                fetch('http://localhost:3000/check-login', {
+                headers: {
+                    'authorization': token
+                }
+                }).then(response => response.json()).then(data => {
+                if (data.message === 'Unauthorized') {
+                    window.location.href = '/login';
+                }
+
+                const user = data.user;
+                linkRegisterTick(user.user_hash);
+                console.log(user);
+
+                }).catch(error => {
+                    console.log(error);
+                    window.location.href = '/login';
+                }) 
+            } else {
+                window.location.href = '/login';
+            }
+        }
+
+        function logout() {
+            localStorage.removeItem('token');
+            window.location.href = '/login';
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            var elems = document.querySelectorAll('.sidenav');
+            var instances = M.Sidenav.init(elems);
+            const darkModeToggle = document.getElementById('darkModeToggle');
+            darkModeToggle.addEventListener('click', toggleDarkMode);
+        });
+
+        function linkRegisterTick(hash) {
+            var link = document.getElementById('link-register-tick');
+            link.href = '/register/' + hash;
+        }
+
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark-mode');
+            const isDarkMode = document.body.classList.contains('dark-mode');
+            localStorage.setItem('darkMode', isDarkMode);
+            updateModeIcon(isDarkMode);
+        }
+
+        function updateModeIcon(isDarkMode) {
+            const modeIcon = document.getElementById('modeIcon');
+            modeIcon.textContent = isDarkMode ? 'wb_sunny' : 'nightlight_round';
+        }
+
+        // Check for saved dark mode preference
+        const savedDarkMode = localStorage.getItem('darkMode');
+        if (savedDarkMode === 'true') {
+            document.body.classList.add('dark-mode');
+            updateModeIcon(true);
+        }
+    </script>
+</body>
+</html>

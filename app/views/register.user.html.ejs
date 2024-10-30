@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro de Usuário</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <style>
+        body {
+            display: flex;
+            min-height: 100vh;
+            flex-direction: column;
+        }
+        main {
+            flex: 1 0 auto;
+        }
+        .container {
+            margin-top: 50px;
+        }
+        .dark-mode {
+            background-color: #121212;
+            color: #e0e0e0;
+        }
+        .dark-mode .card {
+            background-color: #1e1e1e;
+        }
+        .dark-mode .btn {
+            background-color: #64b5f6;
+        }
+        .dark-mode input[type="text"],
+        .dark-mode input[type="email"],
+        .dark-mode input[type="password"] {
+            color: #e0e0e0;
+        }
+        .dark-mode input[type="text"]:focus,
+        .dark-mode input[type="email"]:focus,
+        .dark-mode input[type="password"]:focus {
+            border-bottom: 1px solid #64b5f6;
+            box-shadow: 0 1px 0 0 #64b5f6;
+        }
+        .dark-mode label {
+            color: #b0b0b0;
+        }
+        #toast-container {
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <main>
+        <div class="container">
+            <div class="row">
+                <div class="col s12 m8 offset-m2">
+                    <div class="card">
+                        <div class="card-content">
+                            <span class="card-title">Cadastro de Usuário</span>
+                            <form id="registerForm">
+                                <div class="input-field">
+                                    <input id="name" type="text" class="validate">
+                                    <label for="name">Nome Completo</label>
+                                </div>
+                                <div class="input-field">
+                                    <input id="email" type="email" class="validate">
+                                    <label for="email">E-mail</label>
+                                </div>
+                                <div class="input-field">
+                                    <input id="password" type="password" class="validate">
+                                    <label for="password">Senha</label>
+                                </div>
+                                <div class="input-field">
+                                    <input id="confirmPassword" type="password" class="validate">
+                                    <label for="confirmPassword">Confirmar Senha</label>
+                                </div>
+                                <button class="btn waves-effect waves-light" type="submit">
+                                    Cadastrar
+                                    <i class="material-icons right">send</i>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('registerForm');
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const name = document.getElementById('name').value;
+                const email = document.getElementById('email').value;
+                const password = document.getElementById('password').value;
+                const confirmPassword = document.getElementById('confirmPassword').value;
+                // Validate all fields
+                const fields = [
+                    { id: 'name', name: 'Nome Completo' },
+                    { id: 'email', name: 'E-mail' },
+                    { id: 'password', name: 'Senha' },
+                    { id: 'confirmPassword', name: 'Confirmar Senha' }
+                ];
+
+                const emptyFields = fields.filter(field => !document.getElementById(field.id).value.trim());
+
+                if (emptyFields.length > 0) {
+                    M.toast({html: `Por favor, preencha todos os campos.`, classes: 'red rounded', displayLength: 5000});
+                    return;
+                }
+
+                // Validate email format
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailRegex.test(email)) {
+                    M.toast({html: 'Por favor, insira um endereço de e-mail válido', classes: 'red rounded', displayLength: 3000});
+                    return;
+                }
+
+                if (password !== confirmPassword) {
+                    M.toast({html: 'As senhas não coincidem', classes: 'red rounded', displayLength: 3000});
+                    return;
+                }
+
+                try {
+                    const response = await fetch('http://localhost:3000/register-user', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({name, email, password }),
+                    }).then(response => response.json().then(data => {
+                        if (response.status == 200) {
+                            console.log(data.user_hash);
+                            M.toast({html: data.message, classes: 'rounded green'});
+                            window.location.href = '/register-complete';
+                        } else {
+                            M.toast({html: data.message, classes: 'rounded red'});
+                        }
+                    }));
+                } catch (error) {
+                    console.error('Error:', error);
+                    M.toast({html: 'Erro ao conectar com o servidor', classes: 'red', displayLength: 3000});
+                }
+            });
+
+            // Dark mode toggle
+            const savedDarkMode = localStorage.getItem('darkMode');
+            if (savedDarkMode === 'true') {
+                document.body.classList.add('dark-mode');
+            }
+        });
+    </script>
+</body>
+</html>
