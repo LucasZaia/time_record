@@ -58,14 +58,16 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function fetchTimeRecords() {
+
     const token = localStorage.getItem('token');
-    fetch('/api/time-records', {
+    fetch('http://localhost:3000/time-records', {
         headers: {
             'Authorization': token
         }
     })
     .then(response => response.json())
     .then(data => {
+        console.log(data);
         updateTable(data);
     })
     .catch(error => {
@@ -80,14 +82,9 @@ function updateTable(data) {
     data.forEach(record => {
         const row = `
             <tr>
-                <td data-label="Data">${new Date(record.date).toLocaleDateString()}</td>
-                <td data-label="Tipo">${getRecordTypeName(record.type)}</td>
-                <td data-label="Hora">${new Date(record.date).toLocaleTimeString()}</td>
-                <td data-label="Usuário">${record.user ? record.user.name : 'N/A'}</td>
-                <td data-label="Ações">
-                    <a class="btn-floating btn-small waves-effect waves-light blue" onclick="editRecord(${record.id})"><i class="material-icons">edit</i></a>
-                    <a class="btn-floating btn-small waves-effect waves-light red" onclick="deleteRecord(${record.id})"><i class="material-icons">delete</i></a>
-                </td>
+                <td data-label="Data">${new Date(record.timestamp).toLocaleDateString()}</td>
+                <td data-label="Tipo">${getRecordTypeName(record.recordType)}</td>
+                <td data-label="Hora">${new Date(record.timestamp).toLocaleTimeString()}</td>
             </tr>
         `;
         tableBody.innerHTML += row;
@@ -104,39 +101,12 @@ function getRecordTypeName(type) {
     return types[type] || type;
 }
 
-function editRecord(id) {
-    // Implementar lógica de edição
-    console.log('Editar registro:', id);
-}
-
-function deleteRecord(id) {
-    if (confirm('Tem certeza que deseja excluir este registro?')) {
-        const token = localStorage.getItem('token');
-        fetch(`/api/time-records/${id}`, {
-            method: 'DELETE',
-            headers: {
-                'Authorization': token
-            }
-        })
-        .then(response => {
-            if (response.ok) {
-                M.toast({html: 'Registro excluído com sucesso', classes: 'green'});
-                fetchTimeRecords();
-            } else {
-                throw new Error('Falha ao excluir registro');
-            }
-        })
-        .catch(error => {
-            console.error('Error deleting record:', error);
-            M.toast({html: 'Erro ao excluir registro', classes: 'red'});
-        });
-    }
-}
-
 function applyFilters() {
     const dateFilter = document.getElementById('dateFilter').value;
     const typeFilter = document.getElementById('typeFilter').value;
     const userFilter = document.getElementById('userFilter').value.toLowerCase();
+
+    console.log(dateFilter);
 
     const token = localStorage.getItem('token');
     fetch('/api/time-records', {

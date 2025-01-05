@@ -86,7 +86,6 @@ app.get('/dashboard', (req, res) => {
 
 app.get('/check-login', (req, res) => {
   const token = req.headers.authorization;
-  console.log(token);
   if (!token) {
     return res.status(401).json({ message: 'Unauthorized' });
   }
@@ -96,7 +95,7 @@ app.get('/check-login', (req, res) => {
       return res.status(401).json({ message: 'Unauthorized' });
     }
 
-    const user = await findUserByToken(decoded.id);
+    const user = await findUserByToken(token);
 
     if (user) {
       return res.status(200).json({ message: 'Authorized', user: user });
@@ -104,6 +103,14 @@ app.get('/check-login', (req, res) => {
       return res.status(401).json({ message: 'Unauthorized' });
     }
   });
+});
+
+app.get('/time-records', async (req, res) => {
+  const token = req.headers.authorization;
+  const user = await findUserByToken(token);
+  console.log(user);
+  const timeRecords = await getUserTimeRecords(req, res, user);
+  res.status(200).json(timeRecords);
 });
 
 // 404 Not Found route

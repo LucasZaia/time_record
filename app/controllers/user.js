@@ -1,6 +1,7 @@
 const { where } = require('sequelize');
 const User = require('../models/user.js');
 const jwt = require('jsonwebtoken');
+const { decodeToken } = require('../security/decoder');
 
 // Get all users
 exports.getAllUsers = async (req, res) => {
@@ -117,10 +118,12 @@ exports.loginUser = async (req, res) => {
   }
 };
 
-exports.findUserByToken = async (userId) => {
+exports.findUserByToken = async (token) => {
   try {
-    const user = await User.findOne({ where: { id: userId } });
+    const decodedToken = decodeToken(token);
+    const user = await User.findOne({ where: { id: decodedToken.id } });
     return {
+      id: user.id,
       name: user.name,
       email: user.email,
       user_hash: user.user_hash

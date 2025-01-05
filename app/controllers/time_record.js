@@ -36,15 +36,14 @@ exports.getUserTimeRecords = async (req, res, user) => {
 
     const userId = user.id;
 
-    console.log(userId);
+    let times = [];
+
     const timeRecords = await TimeRecord.findAll({
       where: {userId: userId},
       order: [['timestamp', 'DESC']]
     });
 
-    timeRecords.forEach(record => {
-      console.log(record.timestamp.getTime());
-    });
+    return timeRecords;
 
   } catch (error) {
     res.status(500).json({ message: 'Error fetching time records', error: error.message });

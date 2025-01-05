@@ -157,11 +157,24 @@
                     headers: {
                         'Content-Type': 'application/json'
                     }
-                })
-                .then(response => response.json())
-                .then(data => {
-                    localStorage.setItem('token', data.token);
-                    window.location.href = '/dashboard';
+                }).then(response => {
+
+                    switch (response.status) {
+                        case 200:
+                            response.json().then(data => {
+                                localStorage.setItem('token', data.token);
+                                window.location.href = '/dashboard';
+                            });
+                            break;
+                        default:
+                            response.json().then(data => {
+                                status.textContent = data.message;
+                                M.toast({html: data.message, classes: 'rounded red'});
+                            });
+                            break;
+                    }
+                }).catch(error => {
+                    console.log(error);
                 });
             } else {
                 status.textContent = 'Por favor, preencha todos os campos.';
