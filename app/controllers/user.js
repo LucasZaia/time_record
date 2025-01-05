@@ -2,6 +2,7 @@ const { where } = require('sequelize');
 const User = require('../models/user.js');
 const jwt = require('jsonwebtoken');
 const { decodeToken } = require('../security/decoder');
+const bcrypt = require('bcrypt');
 
 // Get all users
 exports.getAllUsers = async (req, res) => {
@@ -47,7 +48,7 @@ exports.createUser = async (req, res) => {
       name: req.body.name,
       user_hash: hash,
       email: req.body.email,
-      password: req.body.password
+      password: bcrypt.hashSync(req.body.password, 10)
     });
   
     res.status(200).json({message: 'Usuário criado com sucesso', user_hash: newUser.user_hash});
@@ -93,7 +94,7 @@ exports.loginUser = async (req, res) => {
       return res.status(404).json({ message: 'User not found' });
     }
 
-    const isPasswordValid = user.password === password;
+    const isPasswordValid = bcrypt.compareSync(password, user.password);
 
     if (!isPasswordValid) {
       return res.status(401).json({ message: 'Invalid password' });
