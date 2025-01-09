@@ -31,4 +31,4 @@ const sequelize = require('../config/database');
     }
   });
   
-    module.exports = User;
+  module.exports = User;

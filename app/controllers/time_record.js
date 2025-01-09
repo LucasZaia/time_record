@@ -2,7 +2,7 @@ const TimeRecord = require('../models/time_record');
 const User = require('../models/user');
 const { getUserByHash } = require('../controllers/user');
 const { where } = require('sequelize');
-
+const bcrypt = require('bcrypt');
 
 exports.createTimeRecord = async (req, res) => {
   try {
@@ -12,7 +12,7 @@ exports.createTimeRecord = async (req, res) => {
       return res.status(404).json({ message: 'User not found' });
     }
 
-    if (req.body.password != user.password) {
+    if (!bcrypt.compareSync(req.body.password, user.password)) {
       return res.status(401).json({ message: 'Senha inválida' });
     }
 
